@@ -1,0 +1,13 @@
+﻿<UserControl x:Class="tester.Support.Light"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:tester.Support"
+             MouseDown="UserControl_MouseDown"
+             x:Name="RootView">
+    <UserControl.Resources>
+        <local:ActiveConverter x:Key="ActiveConverter"/>
+    </UserControl.Resources>
+    
+    <Label MinWidth="50" Height="50" Content="{Binding Text, ElementName=RootView}" HorizontalAlignment="Center" VerticalAlignment="Center"
+           Background="{Binding Active, ElementName=RootView, Converter={StaticResource ActiveConverter}}" Foreground="White"/>
+</UserControl>

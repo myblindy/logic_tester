@@ -1,0 +1,36 @@
+﻿<Window x:Class="tester.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:tester"
+        xmlns:support="clr-namespace:tester.Support"
+        xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase">
+    <StackPanel Orientation="Vertical">
+        <Label>Inputs:</Label>
+        <ItemsControl ItemsSource="{Binding Inputs}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <support:Light Text="{Binding Text}" Active="{Binding Active}" Margin="5" MouseDown="Light_MouseDown"/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+
+        <Label>Outputs:</Label>
+        <ItemsControl ItemsSource="{Binding Outputs}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <support:Light Text="{Binding Text}" Active="{Binding Active}" Margin="5" IsHitTestVisible="False"/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+    </StackPanel>
+</Window>
