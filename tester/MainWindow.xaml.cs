@@ -21,13 +21,14 @@ namespace tester
     public partial class MainWindow : Window
     {
         public LightModel[] Inputs { get; } = Enumerable.Range(0, 4).Select(idx => new LightModel { Text = $"I{idx + 1}" }).ToArray();
-        public LightModel[] Outputs { get; } = Enumerable.Range(0, 12).Select(idx => new LightModel { Text = $"O{idx + 1}" }).ToArray();
+        public LightModel[] Outputs { get; } = Enumerable.Range(0, 20).Select(idx => new LightModel { Text = $"O{idx + 1}" }).ToArray();
 
         readonly Logic Logic = new Logic();
 
         public MainWindow()
         {
             InitializeComponent();
+            Light_MouseDown(this, null);
             DataContext = this;
         }
 
