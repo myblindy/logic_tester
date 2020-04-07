@@ -1,10 +1,11 @@
-﻿using System;
+﻿using ReactiveUI;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace tester.Support
 {
-    internal class Logic
+    public class Logic : ReactiveObject
     {
         Dictionary<(int Stare, int Conditie), (int StareaUrmatoare, int ContorMinim, int ContorMaxim, TimeSpan Delay)> Transitions =
             new Dictionary<(int Stare, int Conditie), (int StareaUrmatoare, int ContorMinim, int ContorMaxim, TimeSpan Delay)>
@@ -31,7 +32,9 @@ namespace tester.Support
                 [(9, 0b1100)] = (9, 0, 5, TimeSpan.Zero),
                 [(9, 0b0100)] = (1, 3, 5, TimeSpan.FromSeconds(5)),
             };
-        int Starea;
+
+        int starea;
+        public int Starea { get => starea; set => this.RaiseAndSetIfChanged(ref starea, value); }
 
         internal void Process(LightModel[] inputs, LightModel[] outputs)
         {

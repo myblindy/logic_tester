@@ -32,5 +32,8 @@
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
         </ItemsControl>
+
+        <Label>State:</Label>
+        <Label Content="{Binding Logic.Starea}"/>
     </StackPanel>
 </Window>
