@@ -7,10 +7,10 @@ namespace tester.Support
     internal class Logic
     {
         Dictionary<(int Stare, int Conditie), (int StareaUrmatoare, int ContorMinim, int ContorMaxim, TimeSpan Delay)> Transitions =
-            new Dictionary<(int Stare, int Conditie), (int StareaUrmatoare, int ContorMinima, int ContorMaxim, TimeSpan Delay)>
+            new Dictionary<(int Stare, int Conditie), (int StareaUrmatoare, int ContorMinim, int ContorMaxim, TimeSpan Delay)>
             {
                 //initializare
-                [(0, -1)] = (0, -1, -1, TimeSpan.Zero),
+                [(0, -1)] = (0, -1, -1, TimeSpan.Zero),    //stadiul initial -1 nu-i niciodata
                 [(0, 0b1100)] = (1, -1, -1, TimeSpan.Zero),//stadiul initial -1 nu-i niciodata
                 [(1, 0b1100)] = (1, 0, 5, TimeSpan.Zero),                //ramane in stadiul curent
                 [(1, 0b0100)] = (2, 0, 5, TimeSpan.Zero),                 //trece in pasul urmator
@@ -49,14 +49,14 @@ namespace tester.Support
             // 3. Trecem in starea urmatoare
             Starea = StareaUrmatoare;
 
-            for (int i = 0; i < 4; ++i)
+                for (int i = 0; i < 4; ++i)
                 outputs[i + 3].Active = inputs[i].Active;
 
-            // outputs[3].Active = inputs[0].Active;
-            // outputs[4].Active = inputs[1].Active;
-            // outputs[5].Active = inputs[2].Active;
-            // outputs[6].Active = inputs[3].Active;
-            // outputs[5].Active = true;
+           //  outputs[3].Active = inputs[0].Active;
+           //  outputs[4].Active = inputs[1].Active;
+           //  outputs[5].Active = inputs[2].Active;
+           //  outputs[6].Active = inputs[3].Active;
+           //  outputs[5].Active = true;
 
 
             //if (inputs[0].Active && inputs[1].Active && !inputs[2].Active && !inputs[3].Active)
