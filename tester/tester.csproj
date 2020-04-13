@@ -10,4 +10,8 @@
     <PackageReference Include="ReactiveUI" Version="11.3.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\logic\logic.csproj" />
+  </ItemGroup>
+
 </Project>

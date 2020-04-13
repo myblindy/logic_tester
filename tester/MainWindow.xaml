@@ -9,7 +9,7 @@
         <ItemsControl ItemsSource="{Binding Inputs}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <support:Light Text="{Binding Text}" Active="{Binding Active}" Margin="5" MouseDown="Light_MouseDown"/>
+                    <support:Light Text="{Binding Text}" Active="{Binding Active}" Margin="5" />
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
             <ItemsControl.ItemsPanel>

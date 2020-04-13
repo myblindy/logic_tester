@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using tester.Support;
 
 namespace tester
@@ -23,25 +24,25 @@ namespace tester
         public LightModel[] Inputs { get; } = Enumerable.Range(0, 4).Select(idx => new LightModel { Text = $"I{idx + 1}" }).ToArray();
         public LightModel[] Outputs { get; } = Enumerable.Range(0, 20).Select(idx => new LightModel { Text = $"O{idx + 1}" }).ToArray();
 
-        public Logic Logic { get; } = new Logic();
+        public Logic Logic { get; }
+
+        private readonly DispatcherTimer Timer;
 
         public MainWindow()
         {
             InitializeComponent();
-            Light_MouseDown(this, null);
+            Logic = new Logic(Inputs, Outputs);
+
+            Timer = new DispatcherTimer(TimeSpan.FromMilliseconds(10), DispatcherPriority.Normal, (s,e) => Logic.Process(), Dispatcher);
+            Timer.Start();
+
             DataContext = this;
         }
 
-        private void Light_MouseDown(object sender, MouseButtonEventArgs e) =>
-            Logic.Process(Inputs, Outputs);
+        private void Button_Click(object sender, RoutedEventArgs e) => Logic.Reset();
+    }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            Logic.Reset();
-            Logic.Process(Inputs, Outputs);
-        }    }
-
-    public class LightModel : ReactiveObject
+    public class LightModel : ReactiveObject, ILight
     {
         bool active;
         public bool Active { get => active; set => this.RaiseAndSetIfChanged(ref active, value); }
