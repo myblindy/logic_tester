@@ -11,38 +11,68 @@ namespace tester.Support
             new Dictionary<(int Stare, int Conditie), (int StareaUrmatoare, int ContorMinim, int ContorMaxim, TimeSpan Delay)>
             {
                 //initializare
-                [(0, -1)] = (0, -1, -1, TimeSpan.Zero),    //stadiul initial -1 nu-i niciodata
-                [(0, 0b1100)] = (1, -1, -1, TimeSpan.Zero),//stadiul initial -1 nu-i niciodata
-                [(1, 0b1100)] = (1, 0, 5, TimeSpan.Zero),                //ramane in stadiul curent
-                [(1, 0b0100)] = (2, 0, 5, TimeSpan.Zero),                 //trece in pasul urmator
-                [(2, 0b0100)] = (2, 0, 5, TimeSpan.Zero),
+                [(0, -1)] = (0, -1, -1, TimeSpan.Zero),           //stadiul initial -1 nu-i niciodata
+                [(0, 0b0011)] = (1, -1, -1, TimeSpan.Zero),       //stadiul initial -1 nu-i niciodata
+                [(1, 0b0011)] = (1, 0, 5, TimeSpan.Zero),         //ramane in stadiul curent
+                [(1, 0b0010)] = (2, 0, 5, TimeSpan.FromSeconds(5)),         //trece in pasul urmator
+                [(2, 0b0010)] = (2, 0, 5, TimeSpan.Zero),
                 [(2, 0b0000)] = (3, 0, 5, TimeSpan.Zero),
                 [(3, 0b0000)] = (3, 0, 5, TimeSpan.Zero),
-                [(3, 0b0010)] = (4, 0, 5, TimeSpan.Zero),
-                [(4, 0b0010)] = (4, 0, 5, TimeSpan.Zero),
-                [(4, 0b0011)] = (5, 0, 5, TimeSpan.Zero),
-                [(5, 0b0011)] = (5, 0, 5, TimeSpan.Zero),
-                [(5, 0b0010)] = (6, 3, 5, TimeSpan.FromSeconds(5)),        //delay
-                [(6, 0b0010)] = (6, 0, 5, TimeSpan.Zero),
+                [(3, 0b0100)] = (4, 0, 5, TimeSpan.Zero),
+                [(4, 0b0100)] = (4, 0, 5, TimeSpan.Zero),
+                [(4, 0b1100)] = (5, 0, 5, TimeSpan.Zero),
+                [(5, 0b1100)] = (5, 0, 5, TimeSpan.Zero),
+                [(5, 0b0100)] = (6, 3, 5, TimeSpan.FromSeconds(5)),        //delay
+                [(6, 0b0100)] = (6, 0, 5, TimeSpan.Zero),
                 [(6, 0b0000)] = (7, 0, 5, TimeSpan.Zero),
                 [(7, 0b0000)] = (7, 0, 5, TimeSpan.Zero),
-                [(7, 0b0100)] = (8, 0, 5, TimeSpan.Zero),
-                [(8, 0b0100)] = (8, 0, 5, TimeSpan.Zero),
-                [(8, 0b1100)] = (9, 0, 5, TimeSpan.Zero),
-                [(9, 0b1100)] = (9, 0, 5, TimeSpan.Zero),
-                [(9, 0b0100)] = (1, 3, 5, TimeSpan.FromSeconds(5)),
+                [(7, 0b0010)] = (8, 0, 5, TimeSpan.Zero),
+                [(8, 0b0010)] = (8, 0, 5, TimeSpan.Zero),
+                [(8, 0b0011)] = (1, 0, 5, TimeSpan.Zero),
+                [(-1, -1)] = (-1, -1, -1, TimeSpan.Zero),
+                [(1, -1)] = (-1, -1, -1, TimeSpan.Zero),
+                [(2, -1)] = (-1, -1, -1, TimeSpan.Zero),
+                [(3, -1)] = (-1, -1, -1, TimeSpan.Zero),
+                [(4, -1)] = (-1, -1, -1, TimeSpan.Zero),
+                [(5, -1)] = (-1, -1, -1, TimeSpan.Zero),
+                [(6, -1)] = (-1, -1, -1, TimeSpan.Zero),
+                [(7, -1)] = (-1, -1, -1, TimeSpan.Zero),
+                [(8, -1)] = (-1, -1, -1, TimeSpan.Zero),
             };
+
+        Dictionary<int, (int Outputs, int Region)> StateOutputs = new Dictionary<int, (int, int)>
+        {
+            [0] = (0, 0),
+            [1] = (0b000000010011001, 1),  
+            [2] = (0b000000100010000, 2),  
+            [3] = (0b000001000000000, 3),  
+            [4] = (0b000010000100000, 4),  
+            [5] = (0b000100001100010, 5),  
+            [6] = (0b001000000100000, 4),  
+            [7] = (0b010000000000000, 3),  
+            [8] = (0b100000000010000, 2),  
+            [-1] = (0b000000000000100, -1),
+        };
+
+        internal void Reset()
+        {
+            Starea = 0;
+        }
 
         int starea;
         public int Starea { get => starea; set => this.RaiseAndSetIfChanged(ref starea, value); }
 
         internal void Process(LightModel[] inputs, LightModel[] outputs)
         {
+            if (Starea != -1)                                           //ca sa ramana LEDs in starea care au generat eroarea
+                for (int i = 0; i < 4; ++i)
+                    outputs[i + 3].Active = inputs[i].Active;
+
             // 1. Convertim dintr-un sir de LightModel in int Conditie
             //    (pentru ca sa-l folosim in dictionarul de tranzitii)
-            int conditie = Convert.ToInt32(inputs[0].Active) * 2 * 2 * 2 +
-                Convert.ToInt32(inputs[1].Active) * 2 * 2 +
-                Convert.ToInt32(inputs[2].Active) * 2 + Convert.ToInt32(inputs[3].Active);
+            int conditie = Convert.ToInt32(inputs[0].Active) +
+                Convert.ToInt32(inputs[1].Active) * 2 +
+                Convert.ToInt32(inputs[2].Active) * 2 * 2 + Convert.ToInt32(inputs[3].Active) * 2 * 2 * 2;
 
             // 2. Vrem sa stim care este starea urmatoare. Ne trebuie starea, conditia si dictionarul
             if (!Transitions.TryGetValue((Starea, conditie), out var val))
@@ -52,22 +82,24 @@ namespace tester.Support
             // 3. Trecem in starea urmatoare
             Starea = StareaUrmatoare;
 
-                for (int i = 0; i < 4; ++i)
-                outputs[i + 3].Active = inputs[i].Active;
+            // 4. Cataum in dictionar stare ouputs corespunzatoare starii actuale
+            var (Outputs, Region) = StateOutputs[Starea];
 
-           //  outputs[3].Active = inputs[0].Active;
-           //  outputs[4].Active = inputs[1].Active;
-           //  outputs[5].Active = inputs[2].Active;
-           //  outputs[6].Active = inputs[3].Active;
-           //  outputs[5].Active = true;
+            // 1 + 2 * 3 || 1 * 2 + 3 || 1 * (2 + 3)
 
-
-            //if (inputs[0].Active && inputs[1].Active && !inputs[2].Active && !inputs[3].Active)
-            //{
-            //    outputs[0].Active = true;
-            //    outputs[7].Active = true;
-            //}
-            //int state;
+            // 5. Scriem in outputs valoarea output din starea curenta
+            for (int i = 0; i < outputs.Length; ++i)
+            {
+                // 110101 &                     1 << 5 = 0000100000
+                // 000100                       
+                // ======
+                // 000100
+                if (i < 3 || i > 6)   //Intrarile sunt deja copiate. In starea -1 nu mai copiem altele.
+                                         
+                                      //Daca este mai mic ca 3 sau mai mare ca sase conditia este adevarata atunci 
+                    
+                    outputs[i].Active = (Outputs & (1 << i)) != 0;
+            }
         }
     }
 }

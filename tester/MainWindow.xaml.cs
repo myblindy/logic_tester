@@ -34,7 +34,12 @@ namespace tester
 
         private void Light_MouseDown(object sender, MouseButtonEventArgs e) =>
             Logic.Process(Inputs, Outputs);
-    }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Logic.Reset();
+            Logic.Process(Inputs, Outputs);
+        }    }
 
     public class LightModel : ReactiveObject
     {

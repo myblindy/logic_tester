@@ -33,7 +33,11 @@
             </ItemsControl.ItemsPanel>
         </ItemsControl>
 
-        <Label>State:</Label>
-        <Label Content="{Binding Logic.Starea}"/>
+        <StackPanel Orientation="Horizontal">
+            <Label>Sequence:</Label>
+            <Label Content="{Binding Logic.Starea}"/>
+
+            <Button Click="Button_Click">Reset</Button>
+        </StackPanel>
     </StackPanel>
 </Window>
