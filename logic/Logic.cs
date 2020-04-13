@@ -72,9 +72,9 @@ public class Logic : ReactiveObject
     public void Process()
     {
         //ca sa ramana LEDs in starea care au generat eroarea
-        if (Starea != -1)                                           
+        if (Starea != -1)
             for (int i = 0; i < 4; ++i)
-                this.Outputs[i + 3].Active = Inputs[i].Active;
+                Outputs[i + 3].Active = Inputs[i].Active;
 
         // 1. Convertim dintr-un sir de LightModel in int Conditie
         //    (pentru ca sa-l folosim in dictionarul de tranzitii)
@@ -91,15 +91,15 @@ public class Logic : ReactiveObject
         Starea = StareaUrmatoare;
 
         // 4. Cataum in dictionar stare ouputs corespunzatoare starii actuale
-        var (Outputs, Region) = StateOutputs[Starea];
+        var (TargetOutputs, _) = StateOutputs[Starea];
 
         // 5. Scriem in outputs valoarea output din starea curenta
-        for (int i = 0; i < this.Outputs.Length; ++i)
+        for (int i = 0; i < Outputs.Length; ++i)
         {
             //Intrarile sunt deja copiate. In starea -1 nu mai copiem altele.
             //Daca este mai mic ca 3 sau mai mare ca sase conditia este adevarata atunci 
             if (i < 3 || i > 6)
-                this.Outputs[i].Active = (Outputs & (1 << i)) != 0;
+                Outputs[i].Active = (TargetOutputs & (1 << i)) != 0;
         }
     }
 }
