@@ -69,7 +69,10 @@ public class Logic : ReactiveObject
         Starea = 0;
     }
 
-    public void Process()
+    readonly TimeSpan[] OutputStopTimeSpans = new[] { TimeSpan.MaxValue, TimeSpan.MaxValue };           // O1 & O2
+    static readonly TimeSpan OutputStopAfter = TimeSpan.FromSeconds(0.5);
+
+    public void Process(TimeSpan elapsed)
     {
         //ca sa ramana LEDs in starea care au generat eroarea
         if (Starea != -1)
@@ -78,22 +81,34 @@ public class Logic : ReactiveObject
 
         // 1. Convertim dintr-un sir de LightModel in int Conditie
         //    (pentru ca sa-l folosim in dictionarul de tranzitii)
-        int conditie = Convert.ToInt32(Inputs[0].Active) +
+        int conditie =
+            Convert.ToInt32(Inputs[0].Active) +
             Convert.ToInt32(Inputs[1].Active) * 2 +
-            Convert.ToInt32(Inputs[2].Active) * 2 * 2 + Convert.ToInt32(Inputs[3].Active) * 2 * 2 * 2;
+            Convert.ToInt32(Inputs[2].Active) * 2 * 2 +
+            Convert.ToInt32(Inputs[3].Active) * 2 * 2 * 2;
 
         // 2. Vrem sa stim care este starea urmatoare. Ne trebuie starea, conditia si dictionarul
         if (!Transitions.TryGetValue((Starea, conditie), out var val))
             val = Transitions[(Starea, -1)];
         int StareaUrmatoare = val.StareaUrmatoare;
 
-        // 3. Trecem in starea urmatoare
+        // 3. Cataum in dictionar stare ouputs corespunzatoare starii urmatoare
+        var (TargetOutputs, _) = StateOutputs[StareaUrmatoare];
+
+        // 4. update-am limitele in timp cand trebuie sa oprim iesirile
+        if (Starea != StareaUrmatoare)
+        {
+            for (int i = 0; i < OutputStopTimeSpans.Length; ++i)
+                if ((TargetOutputs & (1 << i)) != 0 && !Outputs[i].Active)       // rising edge
+                    OutputStopTimeSpans[i] = elapsed + OutputStopAfter;
+                else if ((TargetOutputs & (1 << i)) == 0)                        // stops
+                    OutputStopTimeSpans[i] = TimeSpan.MaxValue;
+        }
+
+        // 5. Trecem in starea urmatoare
         Starea = StareaUrmatoare;
 
-        // 4. Cataum in dictionar stare ouputs corespunzatoare starii actuale
-        var (TargetOutputs, _) = StateOutputs[Starea];
-
-        // 5. Scriem in outputs valoarea output din starea curenta
+        // 6. Scriem in outputs valoarea output din starea curenta
         for (int i = 0; i < Outputs.Length; ++i)
         {
             //Intrarile sunt deja copiate. In starea -1 nu mai copiem altele.
@@ -101,5 +116,10 @@ public class Logic : ReactiveObject
             if (i < 3 || i > 6)
                 Outputs[i].Active = (TargetOutputs & (1 << i)) != 0;
         }
+
+        // 7. oprim output-urile care trebuie sa fie oprite
+        for (int i = 0; i < OutputStopTimeSpans.Length; ++i)
+            if (elapsed > OutputStopTimeSpans[i])
+                Outputs[i].Active = false;
     }
 }

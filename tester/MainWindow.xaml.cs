@@ -1,6 +1,7 @@
 ﻿using ReactiveUI;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -33,7 +34,8 @@ namespace tester
             InitializeComponent();
             Logic = new Logic(Inputs, Outputs);
 
-            Timer = new DispatcherTimer(TimeSpan.FromMilliseconds(10), DispatcherPriority.Normal, (s,e) => Logic.Process(), Dispatcher);
+            var stopwatch = Stopwatch.StartNew();
+            Timer = new DispatcherTimer(TimeSpan.FromMilliseconds(10), DispatcherPriority.Normal, (s, e) => Logic.Process(stopwatch.Elapsed), Dispatcher);
             Timer.Start();
 
             DataContext = this;
