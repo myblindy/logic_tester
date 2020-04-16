@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 public class Logic : ReactiveObject
 {
@@ -54,14 +56,16 @@ public class Logic : ReactiveObject
 
     private readonly ILight[] Inputs;
     private readonly ILight[] Outputs;
+    private readonly TaskScheduler MainTaskScheduler;
 
     int starea;
     public int Starea { get => starea; set => this.RaiseAndSetIfChanged(ref starea, value); }
 
-    public Logic(ILight[] inputs, ILight[] outputs)
+    public Logic(ILight[] inputs, ILight[] outputs, TaskScheduler mainTaskSheduler)
     {
         Inputs = inputs;
         Outputs = outputs;
+        MainTaskScheduler = mainTaskSheduler;
     }
 
     public void Reset()
