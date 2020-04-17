@@ -28,11 +28,11 @@ namespace tester_rpi
             var inputs = Enumerable.Range(0, InputPinCount).Select(idx => new Light()).ToArray();
             var outputs = Enumerable.Range(0, OutputPinCount).Select(idx => new Light()).ToArray();
 
-            var context = new SingleThreadedSynchronizationContext(Thread.CurrentThread);
-            SynchronizationContext.SetSynchronizationContext(context);
-            var scheduler = new SingleThreadedSynchronizationContextTaskScheduler(context);
+            //var context = new SingleThreadedSynchronizationContext(Thread.CurrentThread);
+            //SynchronizationContext.SetSynchronizationContext(context);
+            //var scheduler = new SingleThreadedSynchronizationContextTaskScheduler(context);
 
-            var logic = new Logic(inputs, outputs, scheduler);
+            var logic = new Logic(inputs, outputs, TaskScheduler.Default /*scheduler*/);
             var gpio = new GpioController();
 
             for (int i = 0; i < InputPinCount; ++i) gpio.OpenPin(i + InputPin0, PinMode.Input);
@@ -52,6 +52,9 @@ namespace tester_rpi
                 var elapsed = Stopwatch.Elapsed;
                 logic.Process(elapsed);
 
+                // execute all queued actions
+                //context.ExecuteAllWorkItems();
+
                 // write the outputs
                 outputs.ForEach((w, idx) => gpio.Write(idx + OutputPin0,
                     idx >= 3 ?
@@ -66,9 +69,6 @@ namespace tester_rpi
                     LastCycleEnd = elapsed;
                     Cycles = 0;
                 }
-
-                // execute all queued actions
-                context.ExecuteAllWorkItems();
             }
         }
 
