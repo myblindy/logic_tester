@@ -12,21 +12,21 @@ public class Logic : ReactiveObject
             [(0, -1)] = (0, -1, -1, TimeSpan.Zero),           //stadiul initial -1 nu-i niciodata
             [(0, 0b0011)] = (1, -1, -1, TimeSpan.Zero),       //stadiul initial -1 nu-i niciodata
             [(1, 0b0011)] = (1, 0, 5, TimeSpan.Zero),         //ramane in stadiul curent
-            [(1, 0b0010)] = (2, 0, 5, TimeSpan.FromSeconds(5)),         //trece in pasul urmator
+            [(1, 0b0010)] = (2, 0, 5, TimeSpan.Zero),         //trece in pasul urmator
             [(2, 0b0010)] = (2, 0, 5, TimeSpan.Zero),
             [(2, 0b0000)] = (3, 0, 5, TimeSpan.Zero),
             [(3, 0b0000)] = (3, 0, 5, TimeSpan.Zero),
             [(3, 0b0100)] = (4, 0, 5, TimeSpan.Zero),
             [(4, 0b0100)] = (4, 0, 5, TimeSpan.Zero),
-            [(4, 0b1100)] = (5, 0, 5, TimeSpan.Zero),
+            [(4, 0b1100)] = (5, 0, 5, TimeSpan.FromSeconds(5)),
             [(5, 0b1100)] = (5, 0, 5, TimeSpan.Zero),
-            [(5, 0b0100)] = (6, 3, 5, TimeSpan.FromSeconds(5)),        //delay
+            [(5, 0b0100)] = (6, 3, 5, TimeSpan.Zero),        //delay
             [(6, 0b0100)] = (6, 0, 5, TimeSpan.Zero),
             [(6, 0b0000)] = (7, 0, 5, TimeSpan.Zero),
             [(7, 0b0000)] = (7, 0, 5, TimeSpan.Zero),
             [(7, 0b0010)] = (8, 0, 5, TimeSpan.Zero),
             [(8, 0b0010)] = (8, 0, 5, TimeSpan.Zero),
-            [(8, 0b0011)] = (1, 0, 5, TimeSpan.Zero),
+            [(8, 0b0011)] = (1, 0, 5, TimeSpan.FromSeconds(5)),
             [(-1, -1)] = (-1, -1, -1, TimeSpan.Zero),
             [(1, -1)] = (-1, -1, -1, TimeSpan.Zero),
             [(2, -1)] = (-1, -1, -1, TimeSpan.Zero),
@@ -38,19 +38,20 @@ public class Logic : ReactiveObject
             [(8, -1)] = (-1, -1, -1, TimeSpan.Zero),
         };
 
-    static readonly Dictionary<int, (int Outputs, int Region)> StateOutputs = new Dictionary<int, (int, int)>
-    {
-        [0] = (0, 0),
-        [1] = (0b000000010011001, 1),
-        [2] = (0b000000100010000, 2),
-        [3] = (0b000001000000000, 3),
-        [4] = (0b000010000100000, 4),
-        [5] = (0b000100001100010, 5),
-        [6] = (0b001000000100000, 4),
-        [7] = (0b010000000000000, 3),
-        [8] = (0b100000000010000, 2),
-        [-1] = (0b000000000000100, -1),
-    };
+    static readonly Dictionary<int, (int Outputs, int Region)> StateOutputs =
+        new Dictionary<int, (int, int)>
+        {
+            [0] = (0, 0),
+            [1] = (0b000000010011001, 1),
+            [2] = (0b000000100010000, 2),
+            [3] = (0b000001000000000, 3),
+            [4] = (0b000010000100000, 4),
+            [5] = (0b000100001100010, 5),
+            [6] = (0b001000000100000, 4),
+            [7] = (0b010000000000000, 3),
+            [8] = (0b100000000010000, 2),
+            [-1] = (0b000000000000100, -1),
+        };
 
     private readonly ILight[] Inputs;
     private readonly ILight[] Outputs;
@@ -70,9 +71,12 @@ public class Logic : ReactiveObject
     }
 
     readonly TimeSpan[] OutputStopTimeSpans = new[] { TimeSpan.MaxValue, TimeSpan.MaxValue };           // O1 & O2
-    static readonly TimeSpan OutputStopAfter = TimeSpan.FromSeconds(0.5);
+    static readonly TimeSpan OutputStopAfter = TimeSpan.FromSeconds(1.5);                               // Cat timp este activ O1 & O2
 
-    public void Process(TimeSpan elapsed)
+    TimeSpan StateChangeAllowedAt;            //Timpul primei incercari + DelaY adica timpul cand permitem tranzitia.
+    int NextDelayedState;
+
+    public void Process(TimeSpan elapsed)      //Timpul curent
     {
         //ca sa ramana LEDs in starea care au generat eroarea
         if (Starea != -1)
@@ -104,22 +108,49 @@ public class Logic : ReactiveObject
                 else if ((TargetOutputs & (1 << i)) == 0)                        // stops
                     OutputStopTimeSpans[i] = TimeSpan.MaxValue;
         }
+        //4bis. Cazurile in care putem trece in starea urmatoare.
 
-        // 5. Trecem in starea urmatoare
-        Starea = StareaUrmatoare;
-
-        // 6. Scriem in outputs valoarea output din starea curenta
-        for (int i = 0; i < Outputs.Length; ++i)
+        //Daca incercam sa ne mutam in alta stare care are Delay si nu am
+        //notat nimic sau am notat ceva si starea urmatoare nu este aceeasi stare pe care am notat-o,
+        //atunci nu ramanem in starea curenta. 
+        if (Starea != StareaUrmatoare && val.Delay != TimeSpan.Zero && (StateChangeAllowedAt == TimeSpan.Zero || (StateChangeAllowedAt != TimeSpan.Zero && NextDelayedState != StareaUrmatoare)))
         {
-            //Intrarile sunt deja copiate. In starea -1 nu mai copiem altele.
-            //Daca este mai mic ca 3 sau mai mare ca sase conditia este adevarata atunci 
-            if (i < 3 || i > 6)
-                Outputs[i].Active = (TargetOutputs & (1 << i)) != 0;
+            StateChangeAllowedAt = elapsed + val.Delay;        //timpul cand ii permitem sa treaca in starea urmatoare
+            NextDelayedState = StareaUrmatoare;
         }
 
-        // 7. oprim output-urile care trebuie sa fie oprite
-        for (int i = 0; i < OutputStopTimeSpans.Length; ++i)
-            if (elapsed > OutputStopTimeSpans[i])
-                Outputs[i].Active = false;
+        //Daca incercam sa ne mutam in alta stare care are Delay si timpul curent este 
+        //mai mare ca timpul primei incercari de a trece + Delay, atunci trecem in starea
+        //urmatoare si sa inscriem ca nu mai asteptam nici un Delay
+
+        if (Starea != StareaUrmatoare && val.Delay != TimeSpan.Zero && elapsed > StateChangeAllowedAt)
+        {
+            Starea = StareaUrmatoare;
+            StateChangeAllowedAt = TimeSpan.Zero;
+        }
+
+        //Daca nu avem Delay trece imediat in starea urmatoare
+        if (val.Delay == TimeSpan.Zero)
+        {
+            Starea = StareaUrmatoare;
+            StateChangeAllowedAt = TimeSpan.Zero;
+        }
+
+        if (Starea == StareaUrmatoare)
+        {
+            // 6. Scriem in outputs valoarea output din starea curenta
+            for (int i = 0; i < Outputs.Length; ++i)
+            {
+                //Intrarile sunt deja copiate. In starea -1 nu mai copiem altele.
+                //Daca este mai mic ca 3 sau mai mare ca sase conditia este adevarata atunci 
+                if (i < 3 || i > 6)
+                    Outputs[i].Active = (TargetOutputs & (1 << i)) != 0;
+            }
+
+            // 7. oprim output-urile care trebuie sa fie oprite
+            for (int i = 0; i < OutputStopTimeSpans.Length; ++i)
+                if (elapsed > OutputStopTimeSpans[i])
+                    Outputs[i].Active = false;
+        }
     }
 }
