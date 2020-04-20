@@ -5,9 +5,11 @@ VisualStudioVersion = 16.0.29926.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "tester_wpf", "tester\tester_wpf.csproj", "{00AC5437-1B2B-4AF9-BF0C-BA0A26D11E20}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "logic", "logic\logic.csproj", "{FFD32E6D-6769-4492-8C2F-232BF820D47B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "logic", "logic\logic.csproj", "{FFD32E6D-6769-4492-8C2F-232BF820D47B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tester_rpi", "tester_rpi\tester_rpi.csproj", "{75C74335-BD62-4585-91E5-B2C665094D3C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "tester_rpi", "tester_rpi\tester_rpi.csproj", "{75C74335-BD62-4585-91E5-B2C665094D3C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tester_rpi_web", "tester_rpi_web\tester_rpi_web.csproj", "{7443FD85-8295-4ED8-90AC-FA47032D2D4C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{75C74335-BD62-4585-91E5-B2C665094D3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{75C74335-BD62-4585-91E5-B2C665094D3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{75C74335-BD62-4585-91E5-B2C665094D3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7443FD85-8295-4ED8-90AC-FA47032D2D4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7443FD85-8295-4ED8-90AC-FA47032D2D4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7443FD85-8295-4ED8-90AC-FA47032D2D4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7443FD85-8295-4ED8-90AC-FA47032D2D4C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,64 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <div class="gui-placeholder"></div>
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        $(function () {
+
+            // create the UI
+            var ph = $(".gui-placeholder");
+            ph.append("<div class='box-container-placeholder'>Inputs:</div>");
+            var iph = $("<div class='box-container-placeholder'></div>"); ph.append(iph);
+            ph.append("<div class='box-container-placeholder'>Outputs:</div>");
+            var oph = $("<div class='box-container-placeholder'></div>"); ph.append(oph);
+            var sph = $("<div class='box-container-placeholder'>State: -1</div>"); ph.append(sph);
+
+            var inputsCount = 5;
+            var outputsCount = 16;
+            for (var idx = 0; idx < inputsCount; ++idx)
+                iph.append("<div class='box'>I" + idx + "</div>");
+            for (var idx = 0; idx < outputsCount; ++idx)
+                oph.append("<div class='box'>O" + idx + "</div>");
+
+            // signalR updates
+            var connection = new signalR.HubConnectionBuilder().withUrl("/rtuhub").build();
+
+            var oldinputs = null;
+            var oldoutputs = null;
+            var oldstate = null;
+            var oldregion = null;
+
+            connection.on('Update', function (inputs, outputs, state, region) {
+                // update the gui
+
+                function process(containerPlaceholder, state, oldState) {
+                    var box = containerPlaceholder.children().first();
+                    for (var idx = 0; idx < state.length; ++idx) {
+                        if (oldState == null || oldState[idx] != state[idx])
+                            if (state[idx] == 0)
+                                box.removeClass('active');
+                            else
+                                box.addClass('active');
+
+                        box = box.next();
+                    }
+                }
+
+                process(iph, inputs, oldinputs); oldinputs = inputs;
+                process(oph, outputs, oldoutputs); oldoutputs = outputs;
+
+                if (oldstate == null || oldstate != state || oldregion == null || oldregion != region)
+                    sph.text("State: " + (oldstate = state) + " Region: " + (oldregion = region));
+            });
+
+            connection.start();
+        });
+    </script>
+}
