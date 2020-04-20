@@ -132,7 +132,7 @@ public class Logic : ReactiveObject
         if (Starea != StareaUrmatoare && val.Delay != TimeSpan.Zero && elapsed > StateChangeAllowedAt)
         {
             Starea = StareaUrmatoare;
-        Region = TargetRegion;
+            Region = TargetRegion;
             StateChangeAllowedAt = TimeSpan.Zero;
         }
 
@@ -140,6 +140,7 @@ public class Logic : ReactiveObject
         if (val.Delay == TimeSpan.Zero)
         {
             Starea = StareaUrmatoare;
+            Region = TargetRegion;
             StateChangeAllowedAt = TimeSpan.Zero;
         }
 
