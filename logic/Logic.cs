@@ -68,6 +68,8 @@ public class Logic : ReactiveObject
     int starea;
     public int Starea { get => starea; set => this.RaiseAndSetIfChanged(ref starea, value); }
 
+    public int Region;
+
     public Logic(ILight[] inputs, ILight[] outputs, TaskScheduler mainTaskSheduler)
     {
         Inputs = inputs;
@@ -101,7 +103,7 @@ public class Logic : ReactiveObject
         int StareaUrmatoare = val.StareaUrmatoare;
 
         // 3. Cataum in dictionar stare ouputs corespunzatoare starii urmatoare
-        var (TargetOutputs, _) = StateOutputs[StareaUrmatoare];
+        var (TargetOutputs, TargetRegion) = StateOutputs[StareaUrmatoare];
         var (CurrentOutputs, _) = StateOutputs[Starea];
 
         // 4. update-am limitele in timp cand trebuie sa oprim iesirile
@@ -122,6 +124,7 @@ public class Logic : ReactiveObject
         }
 
         Starea = StareaUrmatoare;
+            Region = TargetRegion;
 
         // 6. Scriem in outputs valoarea output din starea curenta
         for (int i = 2; i < Outputs.Length; ++i)
