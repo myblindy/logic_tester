@@ -124,11 +124,14 @@ public class Logic : ReactiveObject
         }
 
         Starea = StareaUrmatoare;
-            Region = TargetRegion;
+        Region = TargetRegion;
 
         // 6. Scriem in outputs valoarea output din starea curenta
         for (int i = 2; i < Outputs.Length; ++i)
         {
+            if (Starea == -1 && i >= 7 && i <= 14)
+                continue;
+
             //Intrarile sunt deja copiate. In starea -1 nu mai copiem altele.
             //Daca este mai mic ca 3 sau mai mare ca sase conditia este adevarata atunci 
             if (i < 3 || i > 6)
