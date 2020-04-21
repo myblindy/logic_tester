@@ -55,9 +55,15 @@ public class Logic : ReactiveObject
             [-1] = (0b000000000000100, -1),
         };
 
+    readonly (TimeSpan StartDelay, TimeSpan StopDelay)[] OutputDelays = new[]
+    {
+        (TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(1)),
+        (TimeSpan.FromSeconds(6), TimeSpan.FromSeconds(1.5))
+    };
+
     private readonly ILight[] Inputs;
     private readonly ILight[] Outputs;
-    private readonly TaskScheduler MainTaskScheduler;
+    private readonly TaskScheduler MainTaskScheduler;   //ne spune ce ruleaza si cand face asta
 
     int starea;
     public int Starea { get => starea; set => this.RaiseAndSetIfChanged(ref starea, value); }
@@ -73,12 +79,6 @@ public class Logic : ReactiveObject
     {
         Starea = 0;
     }
-
-    readonly TimeSpan[] OutputStopTimeSpans = new[] { TimeSpan.MaxValue, TimeSpan.MaxValue };           // O1 & O2
-    static readonly TimeSpan OutputStopAfter = TimeSpan.FromSeconds(1.5);                               // Cat timp este activ O1 & O2
-
-    TimeSpan StateChangeAllowedAt;            //Timpul primei incercari + DelaY adica timpul cand permitem tranzitia.
-    int NextDelayedState;
 
     public void Process(TimeSpan elapsed)      //Timpul curent
     {
@@ -102,59 +102,34 @@ public class Logic : ReactiveObject
 
         // 3. Cataum in dictionar stare ouputs corespunzatoare starii urmatoare
         var (TargetOutputs, _) = StateOutputs[StareaUrmatoare];
+        var (CurrentOutputs, _) = StateOutputs[Starea];
 
         // 4. update-am limitele in timp cand trebuie sa oprim iesirile
         if (Starea != StareaUrmatoare)
         {
-            for (int i = 0; i < OutputStopTimeSpans.Length; ++i)
-                if ((TargetOutputs & (1 << i)) != 0 && !Outputs[i].Active)       // rising edge
-                    OutputStopTimeSpans[i] = elapsed + OutputStopAfter;
-                else if ((TargetOutputs & (1 << i)) == 0)                        // stops
-                    OutputStopTimeSpans[i] = TimeSpan.MaxValue;
-        }
-        //4bis. Cazurile in care putem trece in starea urmatoare.
-
-        //Daca incercam sa ne mutam in alta stare care are Delay si nu am
-        //notat nimic sau am notat ceva si starea urmatoare nu este aceeasi stare pe care am notat-o,
-        //atunci nu ramanem in starea curenta. 
-        if (Starea != StareaUrmatoare && val.Delay != TimeSpan.Zero && (StateChangeAllowedAt == TimeSpan.Zero || (StateChangeAllowedAt != TimeSpan.Zero && NextDelayedState != StareaUrmatoare)))
-        {
-            StateChangeAllowedAt = elapsed + val.Delay;        //timpul cand ii permitem sa treaca in starea urmatoare
-            NextDelayedState = StareaUrmatoare;
-        }
-
-        //Daca incercam sa ne mutam in alta stare care are Delay si timpul curent este 
-        //mai mare ca timpul primei incercari de a trece + Delay, atunci trecem in starea
-        //urmatoare si sa inscriem ca nu mai asteptam nici un Delay
-
-        if (Starea != StareaUrmatoare && val.Delay != TimeSpan.Zero && elapsed > StateChangeAllowedAt)
-        {
-            Starea = StareaUrmatoare;
-            StateChangeAllowedAt = TimeSpan.Zero;
-        }
-
-        //Daca nu avem Delay trece imediat in starea urmatoare
-        if (val.Delay == TimeSpan.Zero)
-        {
-            Starea = StareaUrmatoare;
-            StateChangeAllowedAt = TimeSpan.Zero;
-        }
-
-        if (Starea == StareaUrmatoare)
-        {
-            // 6. Scriem in outputs valoarea output din starea curenta
-            for (int i = 0; i < Outputs.Length; ++i)
+            for (int _i = 0; _i < OutputDelays.Length; ++_i)
             {
-                //Intrarile sunt deja copiate. In starea -1 nu mai copiem altele.
-                //Daca este mai mic ca 3 sau mai mare ca sase conditia este adevarata atunci 
-                if (i < 3 || i > 6)
-                    Outputs[i].Active = (TargetOutputs & (1 << i)) != 0;
+                var i = _i;
+                if ((TargetOutputs & (1 << i)) != 0 && (CurrentOutputs & (1 << i)) == 0)      // rising edge
+                    Task.Run(async () =>
+                    {
+                        await Task.Delay(OutputDelays[i].StartDelay).ConfigureScheduler(MainTaskScheduler);
+                        Outputs[i].Active = true;
+                        await Task.Delay(OutputDelays[i].StopDelay).ConfigureScheduler(MainTaskScheduler);
+                        Outputs[i].Active = false;
+                    });
             }
+        }
 
-            // 7. oprim output-urile care trebuie sa fie oprite
-            for (int i = 0; i < OutputStopTimeSpans.Length; ++i)
-                if (elapsed > OutputStopTimeSpans[i])
-                    Outputs[i].Active = false;
+        Starea = StareaUrmatoare;
+
+        // 6. Scriem in outputs valoarea output din starea curenta
+        for (int i = 2; i < Outputs.Length; ++i)
+        {
+            //Intrarile sunt deja copiate. In starea -1 nu mai copiem altele.
+            //Daca este mai mic ca 3 sau mai mare ca sase conditia este adevarata atunci 
+            if (i < 3 || i > 6)
+                Outputs[i].Active = (TargetOutputs & (1 << i)) != 0;
         }
     }
 }
