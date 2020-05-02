@@ -16,7 +16,7 @@ namespace tester_rpi
         private const int InputPinCount = 5;
 
         private const int OutputPin0 = 5;
-        private const int OutputPinCount = 16;
+        private const int OutputPinCount = 17;
 
         static readonly Stopwatch Stopwatch = new Stopwatch();
         static int Cycles;

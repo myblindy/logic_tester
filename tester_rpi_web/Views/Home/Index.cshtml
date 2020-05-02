@@ -19,9 +19,10 @@
             ph.append("<div class='box-container-placeholder'>Outputs:</div>");
             var oph = $("<div class='box-container-placeholder'></div>"); ph.append(oph);
             var sph = $("<div class='box-container-placeholder'>State: -1</div>"); ph.append(sph);
+            var cph = $("<div class='box-container-placeholder'>Counter: -1</div>"); ph.append(cph);
 
             var inputsCount = 5;
-            var outputsCount = 16;
+            var outputsCount = 17;
             for (var idx = 0; idx < inputsCount; ++idx)
                 iph.append("<div class='box'>I" + idx + "</div>");
             for (var idx = 0; idx < outputsCount; ++idx)
@@ -34,8 +35,9 @@
             var oldoutputs = null;
             var oldstate = null;
             var oldregion = null;
+            var oldcounter = null;
 
-            connection.on('Update', function (inputs, outputs, state, region) {
+            connection.on('Update', function (inputs, outputs, state, region, counter) {
                 // update the gui
 
                 function process(containerPlaceholder, state, oldState) {
@@ -56,6 +58,9 @@
 
                 if (oldstate == null || oldstate != state || oldregion == null || oldregion != region)
                     sph.text("State: " + (oldstate = state) + " Region: " + (oldregion = region));
+
+                if (oldcounter == null || oldcounter != counter)
+                    cph.text("Counter: " + (oldcounter = counter));
             });
 
             connection.start();

@@ -37,6 +37,9 @@
             <Label>Sequence:</Label>
             <Label Content="{Binding Logic.Starea}"/>
 
+            <Label>Counter:</Label>
+            <Label Content="{Binding Logic.Counter}"/>
+
             <Button Click="Button_Click">Reset</Button>
         </StackPanel>
     </StackPanel>
