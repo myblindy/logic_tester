@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "logic", "logic\logic.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "tester_rpi", "tester_rpi\tester_rpi.csproj", "{75C74335-BD62-4585-91E5-B2C665094D3C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tester_rpi_web", "tester_rpi_web\tester_rpi_web.csproj", "{7443FD85-8295-4ED8-90AC-FA47032D2D4C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "tester_rpi_web", "tester_rpi_web\tester_rpi_web.csproj", "{7443FD85-8295-4ED8-90AC-FA47032D2D4C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tester_rpi_LCD", "tester_rpi_LCD\tester_rpi_LCD.csproj", "{D6AA9925-1F0B-40C7-A7BD-54A547481051}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{7443FD85-8295-4ED8-90AC-FA47032D2D4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7443FD85-8295-4ED8-90AC-FA47032D2D4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7443FD85-8295-4ED8-90AC-FA47032D2D4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6AA9925-1F0B-40C7-A7BD-54A547481051}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6AA9925-1F0B-40C7-A7BD-54A547481051}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6AA9925-1F0B-40C7-A7BD-54A547481051}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6AA9925-1F0B-40C7-A7BD-54A547481051}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

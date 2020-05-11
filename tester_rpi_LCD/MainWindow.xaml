@@ -1,0 +1,53 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:conv="clr-namespace:tester_rpi_LCD.Conveters"
+        x:Class="tester_rpi_LCD.MainWindow"
+        Title="Tester LCD" FontSize="20" WindowState="Maximized">
+	<Window.Resources>
+		<conv:PinStateToForegroundColorConverter x:Key="PinStateToForegroundColorConverter"/>
+		<conv:PinStateToColorConverter x:Key="PinStateToColorConverter"/>
+	</Window.Resources>
+	
+	<DockPanel>
+		<Grid DockPanel.Dock="Top">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="Auto"/>
+			</Grid.ColumnDefinitions>
+
+			<StackPanel Orientation="Horizontal" Grid.Column="1">
+				<TextBlock Text="{Binding Counter, StringFormat=Counter: {0:### ### ##0}}"
+						   Margin="0,0,5,0" VerticalAlignment="Center"/>
+				<TextBlock Text="{Binding State, StringFormat=State: {0}}"
+						   Margin="0,0,5,0" VerticalAlignment="Center"/>
+				<TextBlock Text="{Binding Region, StringFormat=Region: {0}}"
+						   Margin="0,0,5,0" VerticalAlignment="Center"/>
+			</StackPanel>
+
+			<Button Command="{Binding ResetCommand}" Grid.Column="3">Reset</Button>
+
+		</Grid>
+		<ItemsControl Items="{Binding Lights}">
+			<ItemsControl.ItemsPanel>
+				<ItemsPanelTemplate>
+					<StackPanel Orientation="Horizontal"/>
+				</ItemsPanelTemplate>
+			</ItemsControl.ItemsPanel>
+			<ItemsControl.ItemTemplate>
+				<DataTemplate>
+					<Panel Width="111" Margin="0,0,10,0"
+						   Background="{Binding Active, Converter={StaticResource PinStateToColorConverter}}">
+						<TextBlock TextAlignment="Center" TextWrapping="Wrap"
+								   Foreground="{Binding Active, Converter={StaticResource PinStateToForegroundColorConverter}}"
+								   VerticalAlignment="Center"
+								   Text="{Binding Text}"/>
+					</Panel>
+				</DataTemplate>
+			</ItemsControl.ItemTemplate>
+		</ItemsControl>
+	</DockPanel>
+</Window>
