@@ -34,12 +34,12 @@
 		<ItemsControl Items="{Binding Lights}">
 			<ItemsControl.ItemsPanel>
 				<ItemsPanelTemplate>
-					<StackPanel Orientation="Horizontal"/>
+					<UniformGrid Rows="1"/>
 				</ItemsPanelTemplate>
 			</ItemsControl.ItemsPanel>
 			<ItemsControl.ItemTemplate>
 				<DataTemplate>
-					<Panel Width="111" Margin="0,0,10,0"
+					<Panel Margin="0,0,10,0"
 						   Background="{Binding Active, Converter={StaticResource PinStateToColorConverter}}">
 						<TextBlock TextAlignment="Center" TextWrapping="Wrap"
 								   Foreground="{Binding Active, Converter={StaticResource PinStateToForegroundColorConverter}}"
