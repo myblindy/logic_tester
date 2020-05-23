@@ -20,12 +20,19 @@ namespace tester_rpi_web.Hub
             _hubContext = hubContext;
         }
 
-        Thread Runner;
+        Thread LogicRunner, UIRunner;
 
         public override Task StartAsync(CancellationToken cancellationToken)
         {
-            Runner = new Thread(() => RpiMain(null)) { IsBackground = true, Name = "RPi Runner Thread" };
-            Runner?.Start();
+            LogicInitialized = new AutoResetEvent(false);
+            LogicRunner = new Thread(() => RpiMain(null)) { IsBackground = true, Name = "RPi Runner Thread" };
+            LogicRunner?.Start();
+
+            LogicInitialized.WaitOne();
+            tester_rpi_LCD.Program.Logic = Logic;
+            UIRunner = new Thread(() => tester_rpi_LCD.Program.Main(Array.Empty<string>())) { IsBackground = true, Name = "LCD Runner Thread" };
+            UIRunner?.Start();
+
             return base.StartAsync(cancellationToken);
         }
 
@@ -44,8 +51,8 @@ namespace tester_rpi_web.Hub
                     return sb.ToString();
                 }
 
-                await _hubContext.Clients.All.SendAsync("Update", LightsToString(Inputs), LightsToString(Outputs),
-                    RPiProgram.Logic.Starea, RPiProgram.Logic.Region, RPiProgram.Logic.Counter);
+                await _hubContext.Clients.All.SendAsync("Update", LightsToString(Logic.Inputs), LightsToString(Logic.Outputs),
+                    Logic.Starea, Logic.Region, Logic.Counter);
 
                 await Task.Delay(30);
             }

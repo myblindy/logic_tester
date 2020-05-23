@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\tester_rpi\tester_rpi.csproj" />
+    <ProjectReference Include="..\tester_rpi_LCD\tester_rpi_LCD.csproj" />
   </ItemGroup>
 
 </Project>

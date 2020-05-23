@@ -13,9 +13,9 @@ namespace tester_rpi_LCD
 #if DEBUG
             this.AttachDevTools();
 #endif
-            MainModel mainModel = new MainModel();
-            DataContext = mainModel;
-            mainModel.Counter = 2356788;
+
+            DataContext = new MainModel { Logic = Program.Logic };
+            WindowOpenedEvent.AddClassHandler(typeof(MainWindow), (s, e) => WindowState = WindowState.Maximized);
         }
 
         private void InitializeComponent()

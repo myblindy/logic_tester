@@ -6,7 +6,7 @@
         xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase">
     <StackPanel Orientation="Vertical">
         <Label>Inputs:</Label>
-        <ItemsControl ItemsSource="{Binding Inputs}">
+        <ItemsControl ItemsSource="{Binding Logic.Inputs}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <support:Light Text="{Binding Text}" Active="{Binding Active}" Margin="5" />
@@ -20,7 +20,7 @@
         </ItemsControl>
 
         <Label>Outputs:</Label>
-        <ItemsControl ItemsSource="{Binding Outputs}">
+        <ItemsControl ItemsSource="{Binding Logic.Outputs}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <support:Light Text="{Binding Text}" Active="{Binding Active}" Margin="5" IsHitTestVisible="False"/>

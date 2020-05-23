@@ -22,10 +22,7 @@ namespace tester
 {
     public partial class MainWindow : Window
     {
-        public LightModel[] Inputs { get; } = Enumerable.Range(0, 5).Select(idx => new LightModel { Text = $"I{idx + 1}" }).ToArray();
-        public LightModel[] Outputs { get; } = Enumerable.Range(0, 17).Select(idx => new LightModel { Text = $"O{idx + 1}" }).ToArray();
-
-        public Logic Logic { get; private set; }
+        public Logic<LightModel> Logic { get; private set; }
 
         public static Task<TaskScheduler> GetTaskSchedulerAsync(
             Dispatcher dispatcher,
@@ -54,7 +51,7 @@ namespace tester
                 {
                     Dispatcher.BeginInvoke(() =>
                     {
-                        Logic = new Logic(Inputs, Outputs, t.Result);
+                        Logic = new Logic<LightModel>(t.Result, il => new LightModel { Text = $"I{il + 1}" }, ol => new LightModel { Text = $"O{ol + 1}" });
 
                         var stopwatch = Stopwatch.StartNew();
                         Timer = new DispatcherTimer(TimeSpan.FromMilliseconds(10), DispatcherPriority.Normal,

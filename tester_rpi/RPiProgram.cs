@@ -13,20 +13,18 @@ namespace tester_rpi
         private const int ResetPin = 27;
 
         private const int InputPin0 = 22;
-        private const int InputPinCount = 5;
+        private static int InputPinCount;
 
         private const int OutputPin0 = 5;
-        private const int OutputPinCount = 17;
+        private static int OutputPinCount;
 
         static readonly Stopwatch Stopwatch = new Stopwatch();
         static int Cycles;
         static readonly TimeSpan CycleInterval = TimeSpan.FromSeconds(5);
         static TimeSpan LastCycleEnd = TimeSpan.Zero;
 
-        public static readonly Light[] Inputs = Enumerable.Range(0, InputPinCount).Select(idx => new Light()).ToArray();
-        public static readonly Light[] Outputs = Enumerable.Range(0, OutputPinCount).Select(idx => new Light()).ToArray();
-
-        public static Logic Logic;
+        public static Logic<Light> Logic;
+        public static AutoResetEvent LogicInitialized;
 
         public static void RpiMain(string[] _)
         {
@@ -35,11 +33,21 @@ namespace tester_rpi
             //SynchronizationContext.SetSynchronizationContext(context);
             //var scheduler = new SingleThreadedSynchronizationContextTaskScheduler(context);
 
-            Logic = new Logic(Inputs, Outputs, TaskScheduler.Default /*scheduler*/);
+#if FULL_GPIO
+            Logic = new Logic<Light>(TaskScheduler.Default, il => new Light(), ol => new Light());
+#else
+            Logic = new Logic<Light>(TaskScheduler.Default, il => new Light(), ol => new Light());
+#endif
+
+            InputPinCount = Logic.Inputs.Length;
+            OutputPinCount = Logic.Outputs.Length;
+
             var gpio = new GpioController();
 
+            LogicInitialized?.Set();
+
             for (int i = 0; i < InputPinCount; ++i) gpio.OpenPin(i + InputPin0, PinMode.Input);
-            for (int i = 0; i < OutputPinCount; ++i) gpio.OpenPin(i + OutputPin0, PinMode.Output);
+            for (int i = 0; i < OutputPinCount; ++i) if (!(Logic.Outputs[i] is null)) gpio.OpenPin(i + OutputPin0, PinMode.Output);
             gpio.OpenPin(ResetPin, PinMode.Input);
 
             Stopwatch.Start();
@@ -50,7 +58,7 @@ namespace tester_rpi
 
                 // read the new inputs
                 for (int i = 0; i < InputPinCount; ++i)
-                    Inputs[i].Active = gpio.Read(i + InputPin0) == PinValue.High;
+                    Logic.Inputs[i].Active = gpio.Read(i + InputPin0) == PinValue.High;
 
                 var elapsed = Stopwatch.Elapsed;
                 Logic.Process(elapsed);
@@ -59,10 +67,14 @@ namespace tester_rpi
                 //context.ExecuteAllWorkItems();
 
                 // write the outputs
-                Outputs.ForEach((w, idx) => gpio.Write(idx + OutputPin0,
-                    idx >= 3 ?
-                        w.Active ? PinValue.High : PinValue.Low :
-                        w.Active ? PinValue.Low : PinValue.High));
+                Logic.Outputs.ForEach((w, idx) =>
+                {
+                    if (!(Logic.Outputs[idx] is null))
+                        gpio.Write(idx + OutputPin0,
+                            idx >= 3 ?
+                                w.Active ? PinValue.High : PinValue.Low :
+                                w.Active ? PinValue.Low : PinValue.High);
+                });
 
                 ++Cycles;
 

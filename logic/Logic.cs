@@ -1,4 +1,5 @@
-﻿using ReactiveUI;
+﻿using MoreLinq;
+using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
@@ -6,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-public class Logic : ReactiveObject
+public class Logic<TLight> : ReactiveObject where TLight : ILight
 {
     static readonly Dictionary<(int Stare, int Conditie), (int StareaUrmatoare, int ContorMinim, int ContorMaxim)> Transitions =
         new Dictionary<(int Stare, int Conditie), (int StareaUrmatoare, int ContorMinim, int ContorMaxim)>
@@ -62,8 +63,9 @@ public class Logic : ReactiveObject
         (TimeSpan.FromSeconds(6), TimeSpan.FromSeconds(1.5))
     };
 
-    private readonly ILight[] Inputs;
-    private readonly ILight[] Outputs;
+    public TLight[] Inputs { get; }
+    public TLight[] Outputs { get; }
+
     private readonly TaskScheduler MainTaskScheduler;   // ne spune ce ruleaza si cand face asta
 
     int starea;
@@ -77,10 +79,16 @@ public class Logic : ReactiveObject
 
     bool PreviousCounterInput;
 
-    public Logic(ILight[] inputs, ILight[] outputs, TaskScheduler mainTaskSheduler)
+    public Logic(TaskScheduler mainTaskSheduler, Func<int, TLight> inputGenerator, Func<int, TLight> outputGenerator)
     {
-        Inputs = inputs;
-        Outputs = outputs;
+        Inputs = new TLight[5];
+        for (int i = 0; i < Inputs.Length; ++i)
+            Inputs[i] = inputGenerator(i);
+
+        Outputs = new TLight[18];
+        for (int i = 0; i < Outputs.Length; ++i)
+            Outputs[i] = outputGenerator(i);
+
         MainTaskScheduler = mainTaskSheduler;
     }
 

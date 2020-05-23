@@ -1,25 +1,17 @@
-﻿using Avalonia.Data.Converters;
+﻿using Avalonia.Data;
+using Avalonia.Data.Converters;
 using Avalonia.Media;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 
 namespace tester_rpi_LCD.Conveters
 {
-    class PinStateToColorConverter : IValueConverter
+    class PinStateToColorConverter : IMultiValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            bool active = (bool)value;
-            if (active)
-                return new SolidColorBrush(Colors.Blue);
-            return new SolidColorBrush(Colors.LightBlue);
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+        public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture) =>
+            !values.OfType<BindingNotification>().Any() ? new SolidColorBrush((Color)values[(bool)values[0] ? 1 : 2]) : null;
     }
 }
