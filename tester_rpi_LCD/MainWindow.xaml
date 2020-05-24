@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		    xmlns:conv="clr-namespace:tester_rpi_LCD.Conveters"
         x:Class="tester_rpi_LCD.MainWindow"
-        Title="Tester LCD" FontSize="20" HasSystemDecorations="false">
+        Title="Tester LCD" FontSize="20" HasSystemDecorations="false" Cursor="None">
   <Window.Resources>
     <conv:PinStateToColorConverter x:Key="PinStateToColorConverter"/>
   </Window.Resources>
