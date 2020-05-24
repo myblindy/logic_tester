@@ -35,7 +35,7 @@
 
         <StackPanel Orientation="Horizontal">
             <Label>Sequence:</Label>
-            <Label Content="{Binding Logic.Starea}"/>
+            <Label Content="{Binding Logic.State}"/>
 
             <Label>Counter:</Label>
             <Label Content="{Binding Logic.Counter}"/>

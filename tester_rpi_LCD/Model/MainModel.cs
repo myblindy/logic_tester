@@ -1,4 +1,5 @@
 ﻿using Avalonia.Media;
+using logic;
 using MoreLinq;
 using ReactiveUI;
 using System;
@@ -14,13 +15,13 @@ namespace tester_rpi_LCD.Model
 
         public LightModel[] Lights { get; } = new LightModel[]
         {
-            new LightModel { Type = LightType.Input, Index = 0, ActiveBackColor = Colors.Blue, ActiveColor = Colors.White, InactiveBackColor = Colors.LightBlue, InactiveColor = Colors.Black, Text = "Close Limit" },
-            new LightModel { Type = LightType.Input, Index = 1, ActiveBackColor = Colors.Blue, ActiveColor = Colors.White, InactiveBackColor = Colors.LightBlue, InactiveColor = Colors.Black, Text = "Advanced Close Limit" },
-            new LightModel { Type = LightType.Input, Index = 2, ActiveBackColor = Colors.Blue, ActiveColor = Colors.White, InactiveBackColor = Colors.LightBlue, InactiveColor = Colors.Black, Text = "Advanced Open Limit" },
-            new LightModel { Type = LightType.Input, Index = 3, ActiveBackColor = Colors.Blue, ActiveColor = Colors.White, InactiveBackColor = Colors.LightBlue, InactiveColor = Colors.Black, Text = "Open Limit" },
+            new LightModel { Type = LightType.Output, Index = 3, ActiveBackColor = Colors.Blue, ActiveColor = Colors.White, InactiveBackColor = Colors.LightBlue, InactiveColor = Colors.Black, Text = "Close Limit" },
+            new LightModel { Type = LightType.Output, Index = 4, ActiveBackColor = Colors.Blue, ActiveColor = Colors.White, InactiveBackColor = Colors.LightBlue, InactiveColor = Colors.Black, Text = "Adv. Close Limit" },
+            new LightModel { Type = LightType.Output, Index = 5, ActiveBackColor = Colors.Blue, ActiveColor = Colors.White, InactiveBackColor = Colors.LightBlue, InactiveColor = Colors.Black, Text = "Adv. Open Limit" },
+            new LightModel { Type = LightType.Output, Index = 6, ActiveBackColor = Colors.Blue, ActiveColor = Colors.White, InactiveBackColor = Colors.LightBlue, InactiveColor = Colors.Black, Text = "Open Limit" },
 
-            new LightModel { Type = LightType.Output, Index = 0, ActiveBackColor = Colors.Gray, ActiveColor = Colors.Black, InactiveBackColor = Colors.LightGray, InactiveColor = Colors.Black, Text = "Open Button" },
-            new LightModel { Type = LightType.Output, Index = 1, ActiveBackColor = Colors.Gray, ActiveColor = Colors.Black, InactiveBackColor = Colors.LightGray, InactiveColor = Colors.Black, Text = "Close Button" },
+            new LightModel { Type = LightType.Output, Index = 0, ActiveBackColor = Colors.Black, ActiveColor = Colors.White, InactiveBackColor = Colors.LightGray, InactiveColor = Colors.Black, Text = "Open Button" },
+            new LightModel { Type = LightType.Output, Index = 1, ActiveBackColor = Colors.Black, ActiveColor = Colors.White, InactiveBackColor = Colors.LightGray, InactiveColor = Colors.Black, Text = "Close Button" },
         };
 
         private int counter;
@@ -39,12 +40,12 @@ namespace tester_rpi_LCD.Model
 
         public void UpdateLiveValues()
         {
-            if (!(Logic is null))
+            if (Logic is ILogic logic)
             {
                 Lights.ForEach(l => l.Active = ((ILight)(l.Type == LightType.Input ? Logic.Inputs[l.Index] : Logic.Outputs[l.Index])).Active);
-                Counter = Logic.Counter;
-                State = Logic.State;
-                Region = Logic.Region;
+                Counter = logic.Counter;
+                State = logic.State;
+                Region = logic.Region;
             }
         }
     }

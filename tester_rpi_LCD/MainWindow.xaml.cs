@@ -22,8 +22,10 @@ namespace tester_rpi_LCD
 
             DataContext = new MainModel { Logic = Program.Logic };
             Opened += (s, e) => WindowState = WindowState.Maximized;
+
             Timer = new DispatcherTimer(TimeSpan.FromTicks((long)(1.0 / 10.0 * TimeSpan.TicksPerSecond)), DispatcherPriority.SystemIdle,
                 (s, e) => ((MainModel)DataContext).UpdateLiveValues());
+            Timer.Start();
         }
 
         private void InitializeComponent()

@@ -1,4 +1,5 @@
-﻿using MoreLinq;
+﻿using logic;
+using MoreLinq;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-public class Logic<TLight> : ReactiveObject where TLight : ILight
+public class Logic<TLight> : ReactiveObject, ILogic where TLight : ILight
 {
     static readonly Dictionary<(int Stare, int Conditie), (int StareaUrmatoare, int ContorMinim, int ContorMaxim)> Transitions =
         new Dictionary<(int Stare, int Conditie), (int StareaUrmatoare, int ContorMinim, int ContorMaxim)>
@@ -22,7 +23,7 @@ public class Logic<TLight> : ReactiveObject where TLight : ILight
             [(3, 0b0000)] = (3, -1, -1),
             [(3, 0b0100)] = (4, -1, -1),
             [(4, 0b0100)] = (4, -1, -1),
-            [(4, 0b1100)] = (5, 8, 10),           // delay at Open      
+            [(4, 0b1100)] = (5, 8, 10),           // counter  
             [(5, 0b1100)] = (5, -1, -1),
             [(5, 0b0100)] = (6, -1, -1),
             [(6, 0b0100)] = (6, -1, -1),
@@ -30,7 +31,7 @@ public class Logic<TLight> : ReactiveObject where TLight : ILight
             [(7, 0b0000)] = (7, -1, -1),
             [(7, 0b0010)] = (8, -1, -1),
             [(8, 0b0010)] = (8, -1, -1),
-            [(8, 0b0011)] = (1, 8, 10),            // delay at Close
+            [(8, 0b0011)] = (1, 8, 10),            // counter
             [(-1, -1)] = (-1, -1, -1),
             [(1, -1)] = (-1, -1, -1),
             [(2, -1)] = (-1, -1, -1),
@@ -59,8 +60,8 @@ public class Logic<TLight> : ReactiveObject where TLight : ILight
 
     readonly (TimeSpan StartDelay, TimeSpan StopDelay)[] OutputDelays = new[]
     {
-        (TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(1)),            // timpul de actiune al butoanelor
-        (TimeSpan.FromSeconds(6), TimeSpan.FromSeconds(1.5))
+        (TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(.1)),            // cat timp dureaza pana apasam butonul 
+        (TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(.1))             // si cat timp este apasat
     };
 
     public TLight[] Inputs { get; }
@@ -68,10 +69,10 @@ public class Logic<TLight> : ReactiveObject where TLight : ILight
 
     private readonly TaskScheduler MainTaskScheduler;   // ne spune ce ruleaza si cand face asta
 
-    int starea;
-    public int Starea { get => starea; set => this.RaiseAndSetIfChanged(ref starea, value); }
+    int state;
+    public int State { get => state; set => this.RaiseAndSetIfChanged(ref state, value); }
 
-    public int Region;
+    public int Region { get; set; }
 
     // Counter
     int counter;
@@ -94,7 +95,7 @@ public class Logic<TLight> : ReactiveObject where TLight : ILight
 
     public void Reset()
     {
-        Starea = 0;
+        State = 0;
         Counter = 0;
         Outputs[15].Active = false;
         Outputs[16].Active = false;
@@ -108,7 +109,7 @@ public class Logic<TLight> : ReactiveObject where TLight : ILight
         PreviousCounterInput = Inputs[4].Active;
 
         // ca sa ramana LEDs in starea care au generat eroarea
-        if (Starea != -1)
+        if (State != -1)
             for (int i = 0; i < 4; ++i)
                 Outputs[i + 3].Active = Inputs[i].Active;
 
@@ -121,8 +122,8 @@ public class Logic<TLight> : ReactiveObject where TLight : ILight
             Convert.ToInt32(Inputs[3].Active) * 2 * 2 * 2;
 
         // 2. Vrem sa stim care este starea urmatoare. Ne trebuie starea, conditia si dictionarul
-        if (!Transitions.TryGetValue((Starea, conditie), out var val))
-            val = Transitions[(Starea, -1)];
+        if (!Transitions.TryGetValue((State, conditie), out var val))
+            val = Transitions[(State, -1)];
         int StareaUrmatoare = val.StareaUrmatoare;
 
         if (Counter < val.ContorMinim || Counter > val.ContorMaxim && val.ContorMinim != -1)
@@ -137,10 +138,10 @@ public class Logic<TLight> : ReactiveObject where TLight : ILight
 
         // 3. Cataum in dictionar stare ouputs corespunzatoare starii urmatoare
         var (TargetOutputs, TargetRegion) = StateOutputs[StareaUrmatoare];
-        var (CurrentOutputs, _) = StateOutputs[Starea];
+        var (CurrentOutputs, _) = StateOutputs[State];
 
         // 4. update-am limitele in timp cand trebuie sa oprim iesirile
-        if (Starea != StareaUrmatoare)
+        if (State != StareaUrmatoare)
         {
             for (int _i = 0; _i < OutputDelays.Length; ++_i)
             {
@@ -160,13 +161,13 @@ public class Logic<TLight> : ReactiveObject where TLight : ILight
             }
         }
 
-        Starea = StareaUrmatoare;
+        State = StareaUrmatoare;
         Region = TargetRegion;
 
         // 6. Scriem in outputs valoarea output din starea curenta
         for (int i = 2; i < Outputs.Length - 2; ++i)
         {
-            if (Starea == -1 && i >= 7 && i <= 14)
+            if (State == -1 && i >= 7 && i <= 14)
                 continue;
 
             // Intrarile sunt deja copiate. In starea -1 nu mai copiem altele.

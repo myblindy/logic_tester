@@ -52,7 +52,7 @@ namespace tester_rpi_web.Hub
                 }
 
                 await _hubContext.Clients.All.SendAsync("Update", LightsToString(Logic.Inputs), LightsToString(Logic.Outputs),
-                    Logic.Starea, Logic.Region, Logic.Counter);
+                    Logic.State, Logic.Region, Logic.Counter);
 
                 await Task.Delay(30);
             }
