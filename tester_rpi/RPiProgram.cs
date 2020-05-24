@@ -78,7 +78,11 @@ namespace tester_rpi
                             idx >= 3 ?
                                 w.Active ? PinValue.High : PinValue.Low :
                                 w.Active ? PinValue.Low : PinValue.High));
+
                     firstIteration = false;
+
+                    for (int i = 0; i < OutputPinCount; ++i)
+                        lastOutputs[i] = Logic.Outputs[i].Active;
                 }
 
                 ++Cycles;
