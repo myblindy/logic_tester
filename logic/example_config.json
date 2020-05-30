@@ -1,0 +1,40 @@
+{
+    "Transitions": [
+        {
+            "SourceState": "0",
+            "Condition": "-1",
+            "DestinationState": "0",
+            "CounterMinimum": "-1",
+            "CounterMaximum": "-1"
+        },
+        {
+            "SourceState": "-1",
+            "Condition": "-1",
+            "DestinationState": "-1",
+            "CounterMinimum": "-1",
+            "CounterMaximum": "-1"
+        }
+    ],
+    "StateOutputs": [
+        {
+            "State": "0",
+            "Outputs": "0",
+            "Region": "0"
+        },
+        {
+            "State": "-1",
+            "Outputs": "0b000000000000100",
+            "Region": "-1"
+        }
+    ],
+    "OutputDelays": [
+        {
+            "StartDelaySeconds": "1",
+            "StopDelaySeconds": "0.1"
+        },
+        {
+            "StartDelaySeconds": "1",
+            "StopDelaySeconds": "0.1"
+        }
+    ]
+}

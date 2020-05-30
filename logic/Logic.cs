@@ -1,9 +1,12 @@
 ﻿using logic;
 using MoreLinq;
+using Newtonsoft.Json;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
+using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,58 +14,58 @@ using System.Threading.Tasks;
 public class Logic<TLight> : ReactiveObject, ILogic where TLight : ILight
 {
     static readonly Dictionary<(int Stare, int Conditie), (int StareaUrmatoare, int ContorMinim, int ContorMaxim)> Transitions =
-        new Dictionary<(int Stare, int Conditie), (int StareaUrmatoare, int ContorMinim, int ContorMaxim)>
-        {
-            // initializare
-            [(0, -1)] = (0, -1, -1),             // stadiul initial -1 nu-i niciodata
-            [(0, 0b0011)] = (1, -1, -1),         // stadiul initial -1 nu-i niciodata
-            [(1, 0b0011)] = (1, -1, -1),         // ramane in stadiul curent
-            [(1, 0b0010)] = (2, -1, -1),         // trece in pasul urmator
-            [(2, 0b0010)] = (2, -1, -1),
-            [(2, 0b0000)] = (3, -1, -1),
-            [(3, 0b0000)] = (3, -1, -1),
-            [(3, 0b0100)] = (4, -1, -1),
-            [(4, 0b0100)] = (4, -1, -1),
-            [(4, 0b1100)] = (5, 8, 10),           // counter  
-            [(5, 0b1100)] = (5, -1, -1),
-            [(5, 0b0100)] = (6, -1, -1),
-            [(6, 0b0100)] = (6, -1, -1),
-            [(6, 0b0000)] = (7, -1, -1),
-            [(7, 0b0000)] = (7, -1, -1),
-            [(7, 0b0010)] = (8, -1, -1),
-            [(8, 0b0010)] = (8, -1, -1),
-            [(8, 0b0011)] = (1, 8, 10),            // counter
-            [(-1, -1)] = (-1, -1, -1),
-            [(1, -1)] = (-1, -1, -1),
-            [(2, -1)] = (-1, -1, -1),
-            [(3, -1)] = (-1, -1, -1),
-            [(4, -1)] = (-1, -1, -1),
-            [(5, -1)] = (-1, -1, -1),
-            [(6, -1)] = (-1, -1, -1),
-            [(7, -1)] = (-1, -1, -1),
-            [(8, -1)] = (-1, -1, -1),
-        };
+        new Dictionary<(int Stare, int Conditie), (int StareaUrmatoare, int ContorMinim, int ContorMaxim)>();
+    //{
+    //    // initializare
+    //    [(0, -1)] = (0, -1, -1),             // stadiul initial -1 nu-i niciodata
+    //    [(0, 0b0011)] = (1, -1, -1),         // stadiul initial -1 nu-i niciodata
+    //    [(1, 0b0011)] = (1, -1, -1),         // ramane in stadiul curent
+    //    [(1, 0b0010)] = (2, -1, -1),         // trece in pasul urmator
+    //    [(2, 0b0010)] = (2, -1, -1),
+    //    [(2, 0b0000)] = (3, -1, -1),
+    //    [(3, 0b0000)] = (3, -1, -1),
+    //    [(3, 0b0100)] = (4, -1, -1),
+    //    [(4, 0b0100)] = (4, -1, -1),
+    //    [(4, 0b1100)] = (5, 8, 10),           // counter  
+    //    [(5, 0b1100)] = (5, -1, -1),
+    //    [(5, 0b0100)] = (6, -1, -1),
+    //    [(6, 0b0100)] = (6, -1, -1),
+    //    [(6, 0b0000)] = (7, -1, -1),
+    //    [(7, 0b0000)] = (7, -1, -1),
+    //    [(7, 0b0010)] = (8, -1, -1),
+    //    [(8, 0b0010)] = (8, -1, -1),
+    //    [(8, 0b0011)] = (1, 8, 10),            // counter
+    //    [(-1, -1)] = (-1, -1, -1),
+    //    [(1, -1)] = (-1, -1, -1),
+    //    [(2, -1)] = (-1, -1, -1),
+    //    [(3, -1)] = (-1, -1, -1),
+    //    [(4, -1)] = (-1, -1, -1),
+    //    [(5, -1)] = (-1, -1, -1),
+    //    [(6, -1)] = (-1, -1, -1),
+    //    [(7, -1)] = (-1, -1, -1),
+    //    [(8, -1)] = (-1, -1, -1),
+    //};
 
     static readonly Dictionary<int, (int Outputs, int Region)> StateOutputs =
-        new Dictionary<int, (int, int)>
-        {
-            [0] = (0, 0),
-            [1] = (0b000000010011001, 1),
-            [2] = (0b000000100010000, 2),
-            [3] = (0b000001000000000, 3),
-            [4] = (0b000010000100000, 4),
-            [5] = (0b000100001100010, 5),
-            [6] = (0b001000000100000, 4),
-            [7] = (0b010000000000000, 3),
-            [8] = (0b100000000010000, 2),
-            [-1] = (0b000000000000100, -1),
-        };
+        new Dictionary<int, (int, int)>();
+    //{
+    //    [0] = (0, 0),
+    //    [1] = (0b000000010011001, 1),
+    //    [2] = (0b000000100010000, 2),
+    //    [3] = (0b000001000000000, 3),
+    //    [4] = (0b000010000100000, 4),
+    //    [5] = (0b000100001100010, 5),
+    //    [6] = (0b001000000100000, 4),
+    //    [7] = (0b010000000000000, 3),
+    //    [8] = (0b100000000010000, 2),
+    //    [-1] = (0b000000000000100, -1),
+    //};
 
-    readonly (TimeSpan StartDelay, TimeSpan StopDelay)[] OutputDelays = new[]
-    {
-        (TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(.1)),            // cat timp dureaza pana apasam butonul 
-        (TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(.1))             // si cat timp este apasat
-    };
+    readonly (TimeSpan StartDelay, TimeSpan StopDelay)[] OutputDelays;// = new[]
+    //{
+    //    (TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(.1)),            // cat timp dureaza pana apasam butonul 
+    //    (TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(.1))             // si cat timp este apasat
+    //};
 
     public TLight[] Inputs { get; }
     public TLight[] Outputs { get; }
@@ -91,6 +94,25 @@ public class Logic<TLight> : ReactiveObject, ILogic where TLight : ILight
             Outputs[i] = outputGenerator(i);
 
         MainTaskScheduler = mainTaskSheduler;
+
+        try
+        {
+            static int BinaryStringToInt(string s) => s.StartsWith("0b") ? Convert.ToInt32(s[2..], 2) : Convert.ToInt32(s);
+
+            var config = JsonConvert.DeserializeObject<Configuration>(File.ReadAllText("config.json"));
+            config.Transitions.ForEach(t => Transitions.Add((t.SourceState, BinaryStringToInt(t.Condition)), (t.DestinationState, t.CounterMinimum, t.CounterMaximum)));
+            config.StateOutputs.ForEach(t => StateOutputs.Add(t.State, (BinaryStringToInt(t.Outputs), t.Region)));
+            OutputDelays = config.OutputDelays.Select(d => (TimeSpan.FromTicks((long)(d.StartDelaySeconds * TimeSpan.TicksPerSecond)), TimeSpan.FromTicks((long)(d.StopDelaySeconds * TimeSpan.TicksPerSecond)))).ToArray();
+        }
+        catch
+        {
+            // error -24
+            Transitions.Add((0, -1), (-24, -1, -1));
+            Transitions.Add((-24, -1), (-24, -1, -1));
+            StateOutputs.Add(0, (0, 0));
+            StateOutputs.Add(-24, (0, 0));
+            OutputDelays = Array.Empty<(TimeSpan StartDelay, TimeSpan StopDelay)>();
+        }
     }
 
     public void Reset()
