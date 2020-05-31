@@ -2,63 +2,67 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-		    xmlns:conv="clr-namespace:tester_rpi_LCD.Conveters"
+		xmlns:conv="clr-namespace:tester_rpi_LCD.Conveters"
         x:Class="tester_rpi_LCD.MainWindow"
         Title="Tester LCD" FontSize="20" HasSystemDecorations="false" Cursor="None">
-  <Window.Resources>
-    <conv:PinStateToColorConverter x:Key="PinStateToColorConverter"/>
-  </Window.Resources>
+	<Window.Resources>
+		<conv:PinStateToColorConverter x:Key="PinStateToColorConverter"/>
+		<conv:StateToBackgroundConverter x:Key="StateToBackgroundConverter"/>
+	</Window.Resources>
+	<Window.Background>
+		<Binding Path="State" Converter="{StaticResource StateToBackgroundConverter}" />
+	</Window.Background>
 
-  <DockPanel>
-    <Grid DockPanel.Dock="Top" Margin="0,0,0,10">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*"/>
-        <ColumnDefinition Width="Auto"/>
-        <ColumnDefinition Width="*"/>
-        <ColumnDefinition Width="Auto"/>
-      </Grid.ColumnDefinitions>
+	<DockPanel>
+		<Grid DockPanel.Dock="Top" Margin="0,0,0,10">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="Auto"/>
+			</Grid.ColumnDefinitions>
 
-      <StackPanel Orientation="Horizontal" Grid.Column="1">
-        <TextBlock Text="{Binding Counter, StringFormat=Counter: {0:### ### ##0}}"
-						   Margin="0,0,5,0" VerticalAlignment="Center"/>
-        <TextBlock Text="{Binding State, StringFormat=State: {0}}"
-						   Margin="0,0,5,0" VerticalAlignment="Center"/>
-        <TextBlock Text="{Binding Region, StringFormat=Region: {0}}"
-						   Margin="0,0,5,0" VerticalAlignment="Center"/>
-      </StackPanel>
+			<StackPanel Orientation="Horizontal" Grid.Column="1">
+				<TextBlock Text="{Binding Counter, StringFormat=Counter: {0:### ### ##0}}"
+								   Margin="0,0,5,0" VerticalAlignment="Center"/>
+				<TextBlock Text="{Binding State, StringFormat=State: {0}}"
+								   Margin="0,0,5,0" VerticalAlignment="Center"/>
+				<TextBlock Text="{Binding Region, StringFormat=Region: {0}}"
+								   Margin="0,0,5,0" VerticalAlignment="Center"/>
+			</StackPanel>
 
-      <Button Command="{Binding ResetCommand}" Grid.Column="3">Reset</Button>
-    </Grid>
+			<Button Command="{Binding ResetCommand}" Grid.Column="3">Reset</Button>
+		</Grid>
 
-    <ItemsControl Items="{Binding Lights}">
-      <ItemsControl.ItemsPanel>
-        <ItemsPanelTemplate>
-          <UniformGrid Rows="1"/>
-        </ItemsPanelTemplate>
-      </ItemsControl.ItemsPanel>
-      <ItemsControl.ItemTemplate>
-        <DataTemplate>
-          <Panel Margin="0,0,10,0">
-            <Panel.Background>
-              <MultiBinding Converter="{StaticResource PinStateToColorConverter}">
-                <Binding Path="Active"/>
-                <Binding Path="ActiveBackColor"/>
-                <Binding Path="InactiveBackColor"/>
-              </MultiBinding>
-            </Panel.Background>
+		<ItemsControl Items="{Binding Lights}">
+			<ItemsControl.ItemsPanel>
+				<ItemsPanelTemplate>
+					<UniformGrid Rows="1"/>
+				</ItemsPanelTemplate>
+			</ItemsControl.ItemsPanel>
+			<ItemsControl.ItemTemplate>
+				<DataTemplate>
+					<Panel Margin="0,0,10,0">
+						<Panel.Background>
+							<MultiBinding Converter="{StaticResource PinStateToColorConverter}">
+								<Binding Path="Active"/>
+								<Binding Path="ActiveBackColor"/>
+								<Binding Path="InactiveBackColor"/>
+							</MultiBinding>
+						</Panel.Background>
 
-            <TextBlock TextAlignment="Center" TextWrapping="Wrap" VerticalAlignment="Center" Text="{Binding Text}">
-              <TextBlock.Foreground>
-                <MultiBinding Converter="{StaticResource PinStateToColorConverter}">
-                  <Binding Path="Active"/>
-                  <Binding Path="ActiveColor"/>
-                  <Binding Path="InactiveColor"/>
-                </MultiBinding>
-              </TextBlock.Foreground>
-            </TextBlock>
-          </Panel>
-        </DataTemplate>
-      </ItemsControl.ItemTemplate>
-    </ItemsControl>
-  </DockPanel>
+						<TextBlock TextAlignment="Center" TextWrapping="Wrap" VerticalAlignment="Center" Text="{Binding Text}">
+							<TextBlock.Foreground>
+								<MultiBinding Converter="{StaticResource PinStateToColorConverter}">
+									<Binding Path="Active"/>
+									<Binding Path="ActiveColor"/>
+									<Binding Path="InactiveColor"/>
+								</MultiBinding>
+							</TextBlock.Foreground>
+						</TextBlock>
+					</Panel>
+				</DataTemplate>
+			</ItemsControl.ItemTemplate>
+		</ItemsControl>
+	</DockPanel>
 </Window>

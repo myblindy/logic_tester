@@ -11,7 +11,7 @@ namespace tester_rpi_LCD
 {
     public class MainWindow : Window
     {
-        DispatcherTimer Timer;
+        readonly DispatcherTimer Timer;
 
         public MainWindow()
         {
