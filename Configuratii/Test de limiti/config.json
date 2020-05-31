@@ -1,40 +1,255 @@
 {
-    "Transitions": [
-        {
-            "SourceState": "0",
-            "Condition": "-1",
-            "DestinationState": "0",
-            "CounterMinimum": "-1",
-            "CounterMaximum": "-1"
-        },
-        {
-            "SourceState": "-1",
-            "Condition": "-1",
-            "DestinationState": "-1",
-            "CounterMinimum": "-1",
-            "CounterMaximum": "-1"
-        }
-    ],
-    "StateOutputs": [
-        {
-            "State": "0",
-            "Outputs": "0",
-            "Region": "0"
-        },
-        {
-            "State": "-1",
-            "Outputs": "0b000000000000100",
-            "Region": "-1"
-        }
-    ],
-    "OutputDelays": [
-        {
-            "StartDelaySeconds": "1",
-            "StopDelaySeconds": "0.1"
-        },
-        {
-            "StartDelaySeconds": "1",
-            "StopDelaySeconds": "0.1"
-        }
-    ]
+  "Transitions": [
+    {
+      "SourceState": 0,
+      "Condition": "-1",
+      "DestinationState": 0,
+      "CounterMinimum": -1,
+      "CounterMaximum": -1
+    },
+    {
+      "SourceState": 0,
+      "Condition": "0b0011",
+      "DestinationState": 1,
+      "CounterMinimum": -1,
+      "CounterMaximum": -1
+    },
+    {
+      "SourceState": 1,
+      "Condition": "0b0011",
+      "DestinationState": 1,
+      "CounterMinimum": -1,
+      "CounterMaximum": -1
+    },
+    {
+      "SourceState": 1,
+      "Condition": "0b0010",
+      "DestinationState": 2,
+      "CounterMinimum": -1,
+      "CounterMaximum": -1
+    },
+    {
+      "SourceState": 2,
+      "Condition": "0b0010",
+      "DestinationState": 2,
+      "CounterMinimum": -1,
+      "CounterMaximum": -1
+    },
+    {
+      "SourceState": 2,
+      "Condition": "0b0000",
+      "DestinationState": 3,
+      "CounterMinimum": -1,
+      "CounterMaximum": -1
+    },
+    {
+      "SourceState": 3,
+      "Condition": "0b0000",
+      "DestinationState": 3,
+      "CounterMinimum": -1,
+      "CounterMaximum": -1
+    },
+    {
+      "SourceState": 3,
+      "Condition": "0b0100",
+      "DestinationState": 4,
+      "CounterMinimum": -1,
+      "CounterMaximum": -1
+    },
+    {
+      "SourceState": 4,
+      "Condition": "0b0100",
+      "DestinationState": 4,
+      "CounterMinimum": -1,
+      "CounterMaximum": -1
+    },
+    {
+      "SourceState": 4,
+      "Condition": "0b1100",
+      "DestinationState": 5,
+      "CounterMinimum": 8,
+      "CounterMaximum": 10
+    },
+    {
+      "SourceState": 5,
+      "Condition": "0b1100",
+      "DestinationState": 5,
+      "CounterMinimum": -1,
+      "CounterMaximum": -1
+    },
+    {
+      "SourceState": 5,
+      "Condition": "0b0100",
+      "DestinationState": 6,
+      "CounterMinimum": -1,
+      "CounterMaximum": -1
+    },
+    {
+      "SourceState": 6,
+      "Condition": "0b0100",
+      "DestinationState": 6,
+      "CounterMinimum": -1,
+      "CounterMaximum": -1
+    },
+    {
+      "SourceState": 6,
+      "Condition": "0b0000",
+      "DestinationState": 7,
+      "CounterMinimum": -1,
+      "CounterMaximum": -1
+    },
+    {
+      "SourceState": 7,
+      "Condition": "0b0000",
+      "DestinationState": 7,
+      "CounterMinimum": -1,
+      "CounterMaximum": -1
+    },
+    {
+      "SourceState": 7,
+      "Condition": "0b0010",
+      "DestinationState": 8,
+      "CounterMinimum": -1,
+      "CounterMaximum": -1
+    },
+    {
+      "SourceState": 8,
+      "Condition": "0b0010",
+      "DestinationState": 8,
+      "CounterMinimum": -1,
+      "CounterMaximum": -1
+    },
+    {
+      "SourceState": 8,
+      "Condition": "0b0011",
+      "DestinationState": 1,
+      "CounterMinimum": 8,
+      "CounterMaximum": 10
+    },
+    {
+      "SourceState": -1,
+      "Condition": "-1",
+      "DestinationState": -1,
+      "CounterMinimum": -1,
+      "CounterMaximum": -1
+    },
+    {
+      "SourceState": 1,
+      "Condition": "-1",
+      "DestinationState": -1,
+      "CounterMinimum": -1,
+      "CounterMaximum": -1
+    },
+    {
+      "SourceState": 2,
+      "Condition": "-1",
+      "DestinationState": -1,
+      "CounterMinimum": -1,
+      "CounterMaximum": -1
+    },
+    {
+      "SourceState": 3,
+      "Condition": "-1",
+      "DestinationState": -1,
+      "CounterMinimum": -1,
+      "CounterMaximum": -1
+    },
+    {
+      "SourceState": 4,
+      "Condition": "-1",
+      "DestinationState": -1,
+      "CounterMinimum": -1,
+      "CounterMaximum": -1
+    },
+    {
+      "SourceState": 5,
+      "Condition": "-1",
+      "DestinationState": -1,
+      "CounterMinimum": -1,
+      "CounterMaximum": -1
+    },
+    {
+      "SourceState": 6,
+      "Condition": "-1",
+      "DestinationState": -1,
+      "CounterMinimum": -1,
+      "CounterMaximum": -1
+    },
+    {
+      "SourceState": 7,
+      "Condition": "-1",
+      "DestinationState": -1,
+      "CounterMinimum": -1,
+      "CounterMaximum": -1
+    },
+    {
+      "SourceState": 8,
+      "Condition": "-1",
+      "DestinationState": -1,
+      "CounterMinimum": -1,
+      "CounterMaximum": -1
+    }
+  ],
+  "StateOutputs": [
+    {
+      "State": 0,
+      "Outputs": "0",
+      "Region": 0
+    },
+    {
+      "State": 1,
+      "Outputs": "0b000000010011001",
+      "Region": 1
+    },
+    {
+      "State": 2,
+      "Outputs": "0b000000100010000",
+      "Region": 2
+    },
+    {
+      "State": 3,
+      "Outputs": "0b000001000000000",
+      "Region": 3
+    },
+    {
+      "State": 4,
+      "Outputs": "0b000010000100000",
+      "Region": 4
+    },
+    {
+      "State": 5,
+      "Outputs": "0b000100001100010",
+      "Region": 5
+    },
+    {
+      "State": 6,
+      "Outputs": "0b001000000100000",
+      "Region": 4
+    },
+    {
+      "State": 7,
+      "Outputs": "0b010000000000000",
+      "Region": 3
+    },
+    {
+      "State": 8,
+      "Outputs": "0b100000000010000",
+      "Region": 2
+    },
+    {
+      "State": -1,
+      "Outputs": "0b000000000000100",
+      "Region": -1
+    }
+  ],
+  "OutputDelays": [
+    {
+      "StartDelaySeconds": "1",
+      "StopDelaySeconds": "0.1"
+    },
+    {
+      "StartDelaySeconds": "1",
+      "StopDelaySeconds": "0.1"
+    }
+  ]
 }
