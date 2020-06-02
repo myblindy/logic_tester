@@ -8,20 +8,14 @@
 	<Window.Resources>
 		<conv:PinStateToColorConverter x:Key="PinStateToColorConverter"/>
 		<conv:StateToBackgroundConverter x:Key="StateToBackgroundConverter"/>
+    <conv:IPAddresListToStringConverter x:Key="IPAddresListToStringConverter"/>
 	</Window.Resources>
 	<Window.Background>
 		<Binding Path="State" Converter="{StaticResource StateToBackgroundConverter}" />
 	</Window.Background>
 
 	<DockPanel>
-		<Grid DockPanel.Dock="Top" Margin="0,0,0,10">
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="*"/>
-				<ColumnDefinition Width="Auto"/>
-				<ColumnDefinition Width="*"/>
-				<ColumnDefinition Width="Auto"/>
-			</Grid.ColumnDefinitions>
-
+		<Grid DockPanel.Dock="Top" Margin="0,0,0,10" RowDefinitions="auto,auto" ColumnDefinitions="*,auto,*,auto">
 			<StackPanel Orientation="Horizontal" Grid.Column="1">
 				<TextBlock Text="{Binding Counter, StringFormat=Counter: {0:### ### ##0}}"
 								   Margin="0,0,5,0" VerticalAlignment="Center"/>
@@ -32,6 +26,9 @@
 			</StackPanel>
 
 			<Button Command="{Binding ResetCommand}" Grid.Column="3">Reset</Button>
+
+      <TextBlock Text="{Binding IpAddresses, Converter={StaticResource IPAddresListToStringConverter}, StringFormat=IP Addresses: {0}}" 
+                 Grid.Row="1" Grid.ColumnSpan="4"/>
 		</Grid>
 
 		<ItemsControl Items="{Binding Lights}">

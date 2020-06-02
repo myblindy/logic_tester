@@ -4,6 +4,7 @@ using MoreLinq;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Reactive;
 using System.Text;
 
@@ -32,6 +33,9 @@ namespace tester_rpi_LCD.Model
 
         private int region;
         public int Region { get => region; set => this.RaiseAndSetIfChanged(ref region, value); }
+
+        private IEnumerable<IPAddress> ipAddresses;
+        public IEnumerable<IPAddress> IpAddresses { get => ipAddresses; set => this.RaiseAndSetIfChanged(ref ipAddresses, value); }
 
         public void ResetCommand()
         {
