@@ -10,6 +10,7 @@ namespace logic
         public IList<TransitionConfiguration> Transitions { get; set; }
         public IList<StateOutputsConfiguration> StateOutputs { get; set; }
         public IList<OutputDelaysConfiguration> OutputDelays { get; set; }
+        public bool DisableCounterFreeze { get; set; }
     }
 
     public class TransitionConfiguration
