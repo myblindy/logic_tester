@@ -66,10 +66,13 @@ public class Logic<TLight> : ReactiveObject, ILogic where TLight : ILight
         }
     }
 
+    bool counterFreeze;
+
     public void Reset()
     {
         State = 0;
         Counter = 0;
+        counterFreeze = false;
         Outputs[15].Active = false;
         Outputs[16].Active = false;
     }
@@ -77,8 +80,8 @@ public class Logic<TLight> : ReactiveObject, ILogic where TLight : ILight
     public void Process(TimeSpan elapsed)      // Timpul curent
     {
         // Counter
-        if (Inputs[4].Active && !PreviousCounterInput)                   // Daca inputul 4 este activ si inputul dinainte este neactiv
-            ++Counter;                                                   // Adaugam 1 la counter
+        if (!counterFreeze && Inputs[4].Active && !PreviousCounterInput)                   // Daca inputul 4 este activ si inputul dinainte este neactiv
+            ++Counter;                                                                     // Adaugam 1 la counter
         PreviousCounterInput = Inputs[4].Active;
 
         // ca sa ramana LEDs in starea care au generat eroarea
@@ -120,10 +123,15 @@ public class Logic<TLight> : ReactiveObject, ILogic where TLight : ILight
             {
                 var i = _i;
                 if ((TargetOutputs & (1 << i)) != 0 && (CurrentOutputs & (1 << i)) == 0)      // rising edge
+                {
+                    counterFreeze = true;
+
                     Task.Run(async () =>
                     {
                         await Task.Delay(OutputDelays[i].StartDelay).ConfigureScheduler(MainTaskScheduler);
                         Outputs[i].Active = true;
+
+                        counterFreeze = false;
 
                         Interlocked.Exchange(ref counter, 0);
                         this.RaisePropertyChanged(nameof(Counter));
@@ -131,6 +139,7 @@ public class Logic<TLight> : ReactiveObject, ILogic where TLight : ILight
                         await Task.Delay(OutputDelays[i].StopDelay).ConfigureScheduler(MainTaskScheduler);
                         Outputs[i].Active = false;
                     });
+                }
             }
         }
 
