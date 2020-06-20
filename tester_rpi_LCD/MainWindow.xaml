@@ -11,7 +11,7 @@
     <conv:IPAddresListToStringConverter x:Key="IPAddresListToStringConverter"/>
 	</Window.Resources>
 	<Window.Background>
-		<Binding Path="State" Converter="{StaticResource StateToBackgroundConverter}" />
+		<Binding Path="InternalState" Converter="{StaticResource StateToBackgroundConverter}" />
 	</Window.Background>
 
 	<DockPanel>
