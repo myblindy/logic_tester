@@ -251,5 +251,6 @@
       "StartDelaySeconds": "1",
       "StopDelaySeconds": "0.1"
     }
-  ]
+  ],
+  "DisableCounterFreeze": false
 }

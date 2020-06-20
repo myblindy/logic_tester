@@ -61,6 +61,7 @@ public class Logic<TLight> : ReactiveObject, ILogic where TLight : ILight
             config.Transitions.ForEach(t => Transitions.Add((t.SourceState, BinaryStringToInt(t.Condition)), (t.DestinationState, t.CounterMinimum, t.CounterMaximum)));
             config.StateOutputs.ForEach(t => StateOutputs.Add(t.State, (BinaryStringToInt(t.Outputs), t.Region)));
             OutputDelays = config.OutputDelays.Select(d => (TimeSpan.FromTicks((long)(d.StartDelaySeconds * TimeSpan.TicksPerSecond)), TimeSpan.FromTicks((long)(d.StopDelaySeconds * TimeSpan.TicksPerSecond)))).ToArray();
+            disableCounterFreeze = config.DisableCounterFreeze;
         }
         catch
         {
@@ -73,7 +74,7 @@ public class Logic<TLight> : ReactiveObject, ILogic where TLight : ILight
         }
     }
 
-    bool counterFreeze;
+    bool counterFreeze, disableCounterFreeze;
 
     public void Reset()
     {
@@ -87,7 +88,7 @@ public class Logic<TLight> : ReactiveObject, ILogic where TLight : ILight
     public void Process(TimeSpan elapsed)      // Timpul curent
     {
         // Counter
-        if (!counterFreeze && Inputs[4].Active && !PreviousCounterInput)                   // Daca inputul 4 este activ si inputul dinainte este neactiv
+        if ((disableCounterFreeze || !counterFreeze) && Inputs[4].Active && !PreviousCounterInput)                   // Daca inputul 4 este activ si inputul dinainte este neactiv
             ++Counter;                                                                     // Adaugam 1 la counter
         PreviousCounterInput = Inputs[4].Active;
 
